@@ -10,6 +10,9 @@
     </script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
     </script>
+    <!-- html2canvas for PNG generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+    </script>
     <style>
         /* ─── BASE ─── */
         * {
@@ -455,6 +458,13 @@
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+        .btn-print {
+            background: #2c3e50;
+            color: #fff;
+        }
+        .btn-print:hover {
+            background: #1a252f;
         }
 
         /* ─── CHECKBOX / TOGGLE ─── */
@@ -1190,6 +1200,175 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #bbb;
         }
+
+        /* ─── PNG RECEIPT STYLES (hidden by default, used for capture) ─── */
+        .receipt-wrapper {
+            position: fixed;
+            left: -9999px;
+            top: 0;
+            width: 500px;
+            background: #ffffff;
+            font-family: 'Inter', sans-serif;
+            padding: 32px 30px 28px 30px;
+            border-radius: 0;
+            box-shadow: none;
+            z-index: 99999;
+            pointer-events: none;
+            opacity: 0;
+        }
+        .receipt-wrapper.visible {
+            position: relative;
+            left: 0;
+            opacity: 1;
+            pointer-events: auto;
+            margin: 0 auto;
+        }
+        .receipt {
+            background: #ffffff;
+            color: #1a1a1e;
+        }
+        .receipt .receipt-header {
+            text-align: center;
+            border-bottom: 2px solid #1a1a1e;
+            padding-bottom: 16px;
+            margin-bottom: 18px;
+        }
+        .receipt .receipt-header .brand {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #1a1a1e;
+        }
+        /* removed .brand-sub */
+        .receipt .receipt-header .order-id {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+        .receipt .receipt-header .order-id span {
+            color: #1a1a1e;
+            font-weight: 700;
+        }
+        .receipt .receipt-section {
+            margin-bottom: 14px;
+        }
+        .receipt .receipt-section .section-title {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #999;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #e8eaed;
+            padding-bottom: 4px;
+        }
+        .receipt .receipt-section .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            font-size: 0.8rem;
+            color: #333;
+            line-height: 1.5;
+        }
+        .receipt .receipt-section .row .label {
+            color: #888;
+            font-weight: 400;
+        }
+        .receipt .receipt-section .row .value {
+            font-weight: 500;
+            color: #1a1a1e;
+            text-align: right;
+        }
+        .receipt .receipt-items {
+            margin: 12px 0 14px 0;
+            border-top: 1px solid #e8eaed;
+            border-bottom: 1px solid #e8eaed;
+            padding: 10px 0;
+        }
+        .receipt .receipt-items .item-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 0.78rem;
+            color: #333;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .receipt .receipt-items .item-row:last-child {
+            border-bottom: none;
+        }
+        .receipt .receipt-items .item-row .item-desc {
+            flex: 1;
+            padding-right: 10px;
+        }
+        .receipt .receipt-items .item-row .item-desc .item-name {
+            font-weight: 500;
+        }
+        .receipt .receipt-items .item-row .item-desc .item-meta {
+            font-size: 0.65rem;
+            color: #999;
+        }
+        .receipt .receipt-items .item-row .item-price {
+            font-weight: 600;
+            color: #1a1a1e;
+            white-space: nowrap;
+        }
+        .receipt .receipt-totals {
+            margin-top: 6px;
+        }
+        .receipt .receipt-totals .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            font-size: 0.8rem;
+            color: #333;
+        }
+        .receipt .receipt-totals .total-row .label {
+            color: #888;
+        }
+        .receipt .receipt-totals .total-row .value {
+            font-weight: 500;
+            color: #1a1a1e;
+        }
+        .receipt .receipt-totals .grand-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0 4px 0;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1a1a1e;
+            border-top: 2px solid #1a1a1e;
+            margin-top: 6px;
+        }
+        .receipt .receipt-footer {
+            text-align: center;
+            font-size: 0.6rem;
+            color: #bbb;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #e8eaed;
+            letter-spacing: 0.2px;
+        }
+        /* ─── PRINT BUTTON ICON ─── */
+        .btn-print-png {
+            background: #2c3e50;
+            color: #fff;
+            border: none;
+            padding: 0.15rem 0.7rem;
+            font-size: 0.65rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: background 0.15s;
+        }
+        .btn-print-png:hover {
+            background: #1a252f;
+        }
+        .btn-print-png i {
+            font-size: 0.7rem;
+        }
     </style>
 </head>
 <body>
@@ -1479,6 +1658,9 @@
     <!-- ─── TOAST CONTAINER ─── -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- ─── HIDDEN RECEIPT CONTAINER (used for PNG generation) ─── -->
+    <div class="receipt-wrapper" id="receiptContainer"></div>
+
     <script>
         // ─── FIREBASE CONFIG ──────────────────────────────────────
         const firebaseConfig = {
@@ -1574,7 +1756,6 @@
             document.body.style.overflow = '';
         }
 
-        // Close lightbox on Escape key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeImageLightbox();
@@ -1692,6 +1873,136 @@
             }
         }
 
+        // ─── PNG GENERATION: ORDER RECEIPT ──────────────────────
+        function buildReceiptHTML(order) {
+            const orderId = order._key ? order._key.slice(-8) : 'N/A';
+            const customer = order.customer || {};
+            const items = order.items || [];
+            const subtotal = order.subtotal || 0;
+            const shipping = order.shipping || 0;
+            const total = order.total || 0;
+
+            let itemsHTML = '';
+            if (items.length) {
+                itemsHTML = items.map(item => {
+                    const name = item.name || 'Product';
+                    const qty = item.quantity || 1;
+                    const color = item.color || '';
+                    const size = item.size || '';
+                    const price = item.priceLE || 0;
+                    const meta = [];
+                    if (color) meta.push(color);
+                    if (size) meta.push(size);
+                    const metaStr = meta.length ? ` · ${meta.join(' · ')}` : '';
+                    return `
+                            <div class="item-row">
+                                <div class="item-desc">
+                                    <span class="item-name">${name}</span>
+                                    <span class="item-meta">×${qty}${metaStr}</span>
+                                </div>
+                                <span class="item-price">${formatLE(price * qty)}</span>
+                            </div>
+                        `;
+                }).join('');
+            } else {
+                itemsHTML = `<div style="font-size:0.75rem;color:#999;padding:6px 0;">No items</div>`;
+            }
+
+            // Clean phone for display
+            const phone = customer.phone || '—';
+            const phone2 = customer.phone2 || '';
+            const name = customer.name || '—';
+            const governorate = customer.governorate || '—';
+            const address = customer.address || '—';
+            const note = customer.note || '';
+
+            return `
+                    <div class="receipt" id="receiptToCapture">
+                        <div class="receipt-header">
+                            <div class="brand">SH_BY SARAH HASSAN</div>
+                            <!-- brand-sub removed as requested -->
+                            <div class="order-id">Order #<span>${orderId}</span></div>
+                        </div>
+
+                        <div class="receipt-section">
+                            <div class="section-title">Customer Details</div>
+                            <div class="row"><span class="label">Name</span><span class="value">${name}</span></div>
+                            <div class="row"><span class="label">Phone</span><span class="value">${phone}${phone2 ? ' · ' + phone2 : ''}</span></div>
+                            <div class="row"><span class="label">Governorate</span><span class="value">${governorate}</span></div>
+                            <div class="row"><span class="label">Address</span><span class="value">${address}</span></div>
+                            ${note ? `<div class="row"><span class="label">Note</span><span class="value">${note}</span></div>` : ''}
+                        </div>
+
+                        <div class="receipt-items">
+                            <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#999;margin-bottom:6px;">Order Items</div>
+                            ${itemsHTML}
+                        </div>
+
+                        <div class="receipt-totals">
+                            <div class="total-row"><span class="label">Subtotal</span><span class="value">${formatLE(subtotal)}</span></div>
+                            <div class="total-row"><span class="label">Shipping</span><span class="value">${formatLE(shipping)}</span></div>
+                            <div class="grand-total">
+                                <span>Total</span>
+                                <span>${formatLE(total)}</span>
+                            </div>
+                        </div>
+
+                        <div class="receipt-footer">
+                            ${new Date().toLocaleString('en-EG', { dateStyle: 'medium', timeStyle: 'short' })} · Thank you for your order
+                        </div>
+                    </div>
+                `;
+        }
+
+        async function downloadOrderAsPNG(order) {
+            if (!order) return;
+
+            const container = document.getElementById('receiptContainer');
+            if (!container) return;
+
+            // Build receipt HTML
+            container.innerHTML = buildReceiptHTML(order);
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'none';
+
+            // Wait for DOM update
+            await new Promise(r => requestAnimationFrame(r));
+            await new Promise(r => setTimeout(r, 150));
+
+            const receiptEl = document.getElementById('receiptToCapture');
+            if (!receiptEl) {
+                container.innerHTML = '';
+                showToast('Could not generate receipt.');
+                return;
+            }
+
+            try {
+                const canvas = await html2canvas(receiptEl, {
+                    scale: 2.5,
+                    useCORS: true,
+                    allowTaint: false,
+                    backgroundColor: '#ffffff',
+                    logging: false,
+                    width: 500,
+                    height: receiptEl.scrollHeight,
+                });
+
+                const link = document.createElement('a');
+                link.download = `order-${order._key ? order._key.slice(-8) : 'receipt'}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                showToast('PNG downloaded!');
+            } catch (err) {
+                console.error('PNG generation error:', err);
+                showToast('Failed to generate PNG.');
+            } finally {
+                container.innerHTML = '';
+                container.style.opacity = '0';
+                container.style.pointerEvents = 'none';
+            }
+        }
+
         // ─── RENDER: ORDERS ──────────────────────────────────────
         function renderOrders() {
             const container = document.getElementById('orderList');
@@ -1720,16 +2031,17 @@
                 ).join('') : '';
                 const moreItems = order.items && order.items.length > 3 ?
                     `<span style="font-size:0.6rem;color:#999;">+${order.items.length - 3} more</span>` : '';
-                // Clean phone number for WhatsApp
                 let phone = order.customer?.phone || '';
                 let phoneDigits = phone.replace(/\D/g, '');
-                // Egypt country code is 20
                 let waLink = phoneDigits ? `https://wa.me/20${phoneDigits}` : '#';
 
+                // Unique key for this order
+                const orderKey = order._key || '';
+
                 return `
-                        <div class="order-item">
+                        <div class="order-item" data-order-key="${orderKey}">
                             <div class="order-head">
-                                <span class="id">#${order._key.slice(-8)}</span>
+                                <span class="id">#${orderKey.slice(-8)}</span>
                                 <span class="status status-${statusClass}">${statusClass.toUpperCase()}</span>
                             </div>
                             <div class="order-body">
@@ -1740,21 +2052,25 @@
                                 <span class="total">${formatLE(order.total || 0)}</span>
                             </div>
                             <div class="order-actions">
-                                <select class="status-select" data-key="${order._key}">
+                                <select class="status-select" data-key="${orderKey}">
                                     <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
                                     <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>Processing</option>
                                     <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
                                     <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
                                     <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
                                 </select>
-                                <button class="btn btn-primary btn-sm update-status-btn" data-key="${order._key}">Update</button>
-                                <button class="btn btn-danger btn-sm delete-order-btn" data-key="${order._key}">Delete</button>
+                                <button class="btn btn-primary btn-sm update-status-btn" data-key="${orderKey}">Update</button>
+                                <button class="btn btn-danger btn-sm delete-order-btn" data-key="${orderKey}">Delete</button>
                                 <a href="${waLink}" target="_blank" class="btn btn-success btn-sm whatsapp-btn" ${!phoneDigits ? 'disabled' : ''}>
                                     <i class="fab fa-whatsapp"></i> WhatsApp
                                 </a>
-                                <span class="order-detail-toggle" data-key="${order._key}">Show details</span>
+                                <!-- PRINT PNG BUTTON -->
+                                <button class="btn-print-png print-png-btn" data-key="${orderKey}" title="Download PNG receipt">
+                                    <i class="fas fa-image"></i> Print PNG
+                                </button>
+                                <span class="order-detail-toggle" data-key="${orderKey}">Show details</span>
                             </div>
-                            <div class="order-detail" id="orderDetail_${order._key}">
+                            <div class="order-detail" id="orderDetail_${orderKey}">
                                 <strong>Customer:</strong> ${order.customer?.name || '—'}<br />
                                 <strong>Phone:</strong> ${order.customer?.phone || '—'} ${order.customer?.phone2 ? '· ' + order.customer.phone2 : ''}<br />
                                 <strong>Governorate:</strong> ${order.customer?.governorate || '—'}<br />
@@ -1773,7 +2089,7 @@
                     `;
             }).join('');
 
-            // Event listeners
+            // ─── EVENT: Update Status ──────────────────────────────
             container.querySelectorAll('.update-status-btn').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const key = btn.dataset.key;
@@ -1786,6 +2102,7 @@
                 });
             });
 
+            // ─── EVENT: Delete Order ──────────────────────────────
             container.querySelectorAll('.delete-order-btn').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const key = btn.dataset.key;
@@ -1797,6 +2114,7 @@
                 });
             });
 
+            // ─── EVENT: Toggle Details ────────────────────────────
             container.querySelectorAll('.order-detail-toggle').forEach(el => {
                 el.addEventListener('click', () => {
                     const key = el.dataset.key;
@@ -1804,6 +2122,19 @@
                     if (detail) {
                         detail.classList.toggle('open');
                         el.textContent = detail.classList.contains('open') ? 'Hide details' : 'Show details';
+                    }
+                });
+            });
+
+            // ─── EVENT: Print PNG ──────────────────────────────────
+            container.querySelectorAll('.print-png-btn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const key = btn.dataset.key;
+                    const order = allOrders.find(o => o._key === key);
+                    if (order) {
+                        await downloadOrderAsPNG(order);
+                    } else {
+                        showToast('Order not found.');
                     }
                 });
             });
@@ -2247,18 +2578,15 @@
         // ─── TAB SWITCHING ────────────────────────────────────────
         function switchTab(tab) {
             currentTab = tab;
-            // Update tab buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === tab);
             });
             document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.tab === tab);
             });
-            // Update panels
             document.querySelectorAll('.section-panel').forEach(panel => {
                 panel.classList.toggle('active', panel.id === `panel${tab.charAt(0).toUpperCase() + tab.slice(1)}`);
             });
-            // Update page title
             const titles = {
                 orders: 'Orders',
                 hero: 'Hero Banner',
@@ -2269,7 +2597,6 @@
             document.getElementById('pageTitle').textContent = titles[tab] || 'Dashboard';
             document.getElementById('pageSubtitle').textContent = `Manage your ${titles[tab]?.toLowerCase() || 'store'}.`;
 
-            // Show/hide header action button
             const addBtn = document.getElementById('headerAddProduct');
             if (tab === 'products') {
                 addBtn.style.display = 'inline-flex';
@@ -2280,8 +2607,6 @@
             } else {
                 addBtn.style.display = 'none';
             }
-
-            // Close mobile sidebar
             closeSidebar();
         }
 
@@ -2314,7 +2639,6 @@
 
             // ─── EVENT BINDINGS ──────────────────────────────────
 
-            // Tab switching
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => switchTab(btn.dataset.tab));
             });
@@ -2325,11 +2649,9 @@
                 });
             });
 
-            // Product form
             document.getElementById('productForm').addEventListener('submit', handleProductSubmit);
             document.getElementById('cancelEditBtn').addEventListener('click', resetProductForm);
 
-            // Color & size
             document.getElementById('addColorBtn').addEventListener('click', async () => {
                 const picker = document.getElementById('colorPicker');
                 const fileInput = document.getElementById('colorImageFile');
@@ -2361,12 +2683,10 @@
                     document.getElementById('addSizeBtn').click(); }
             });
 
-            // Category
             document.getElementById('addCategoryBtn').addEventListener('click', addCategory);
             document.getElementById('newCategoryName').addEventListener('keydown', (e) => { if (e.key === 'Enter')
                     addCategory(); });
 
-            // Category Image Upload
             document.getElementById('uploadCategoryImageBtn').addEventListener('click', async () => {
                 const fileInput = document.getElementById('categoryImageFile');
                 const file = fileInput.files[0];
@@ -2381,11 +2701,9 @@
                 fileInput.value = '';
             });
 
-            // Hero
             document.getElementById('updateHeroUploadBtn').addEventListener('click', uploadHeroFile);
             document.getElementById('updateHeroTextBtn').addEventListener('click', updateHeroText);
 
-            // Shipping reset
             document.getElementById('resetShippingBtn').addEventListener('click', async () => {
                 if (!confirm('Reset all shipping rates to 1 LE?')) return;
                 await resetShippingToDefault();
@@ -2393,7 +2711,6 @@
                 renderShipping();
             });
 
-            // Mobile menu
             const mobileBtn = document.getElementById('mobileMenuBtn');
             if (mobileBtn) {
                 mobileBtn.style.display = 'inline-flex';
@@ -2401,7 +2718,6 @@
             }
             document.getElementById('sidebarOverlay').addEventListener('click', closeSidebar);
 
-            // Quick nav links
             document.getElementById('navAddProduct').addEventListener('click', (e) => {
                 e.preventDefault();
                 switchTab('products');
@@ -2416,24 +2732,20 @@
                 closeSidebar();
             });
 
-            // Header add product
             document.getElementById('headerAddProduct').addEventListener('click', () => {
                 resetProductForm();
                 document.getElementById('productFormCard').scrollIntoView({ behavior: 'smooth' });
             });
 
-            // Keyboard shortcut: Escape closes sidebar
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape' && document.getElementById('sidebar').classList.contains('open')) {
                     closeSidebar();
                 }
             });
 
-            // Set default tab
             switchTab('orders');
         }
 
-        // ─── START ────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
