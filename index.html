@@ -1226,6 +1226,7 @@
         .receipt {
             background: #ffffff;
             color: #1a1a1e;
+            direction: rtl;
         }
         .receipt .receipt-header {
             text-align: center;
@@ -1239,7 +1240,6 @@
             letter-spacing: -0.5px;
             color: #1a1a1e;
         }
-        /* removed .brand-sub */
         .receipt .receipt-header .order-id {
             font-size: 0.75rem;
             color: #888;
@@ -1278,7 +1278,7 @@
         .receipt .receipt-section .row .value {
             font-weight: 500;
             color: #1a1a1e;
-            text-align: right;
+            text-align: left;
         }
         .receipt .receipt-items {
             margin: 12px 0 14px 0;
@@ -1299,7 +1299,8 @@
         }
         .receipt .receipt-items .item-row .item-desc {
             flex: 1;
-            padding-right: 10px;
+            padding-left: 10px;
+            text-align: right;
         }
         .receipt .receipt-items .item-row .item-desc .item-name {
             font-weight: 500;
@@ -1873,7 +1874,7 @@
             }
         }
 
-        // ─── PNG GENERATION: ORDER RECEIPT ──────────────────────
+        // ─── PNG GENERATION: ORDER RECEIPT (ARABIC) ──────────────
         function buildReceiptHTML(order) {
             const orderId = order._key ? order._key.slice(-8) : 'N/A';
             const customer = order.customer || {};
@@ -1905,10 +1906,9 @@
                         `;
                 }).join('');
             } else {
-                itemsHTML = `<div style="font-size:0.75rem;color:#999;padding:6px 0;">No items</div>`;
+                itemsHTML = `<div style="font-size:0.75rem;color:#999;padding:6px 0;text-align:center;">لا توجد منتجات</div>`;
             }
 
-            // Clean phone for display
             const phone = customer.phone || '—';
             const phone2 = customer.phone2 || '';
             const name = customer.name || '—';
@@ -1920,35 +1920,34 @@
                     <div class="receipt" id="receiptToCapture">
                         <div class="receipt-header">
                             <div class="brand">SH_BY SARAH HASSAN</div>
-                            <!-- brand-sub removed as requested -->
-                            <div class="order-id">Order #<span>${orderId}</span></div>
+                            <div class="order-id">رقم الطلب #<span>${orderId}</span></div>
                         </div>
 
                         <div class="receipt-section">
-                            <div class="section-title">Customer Details</div>
-                            <div class="row"><span class="label">Name</span><span class="value">${name}</span></div>
-                            <div class="row"><span class="label">Phone</span><span class="value">${phone}${phone2 ? ' · ' + phone2 : ''}</span></div>
-                            <div class="row"><span class="label">Governorate</span><span class="value">${governorate}</span></div>
-                            <div class="row"><span class="label">Address</span><span class="value">${address}</span></div>
-                            ${note ? `<div class="row"><span class="label">Note</span><span class="value">${note}</span></div>` : ''}
+                            <div class="section-title">بيانات العميل</div>
+                            <div class="row"><span class="label">الاسم</span><span class="value">${name}</span></div>
+                            <div class="row"><span class="label">الهاتف</span><span class="value">${phone}${phone2 ? ' · ' + phone2 : ''}</span></div>
+                            <div class="row"><span class="label">المحافظة</span><span class="value">${governorate}</span></div>
+                            <div class="row"><span class="label">العنوان</span><span class="value">${address}</span></div>
+                            ${note ? `<div class="row"><span class="label">ملاحظة</span><span class="value">${note}</span></div>` : ''}
                         </div>
 
                         <div class="receipt-items">
-                            <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#999;margin-bottom:6px;">Order Items</div>
+                            <div style="font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#999;margin-bottom:6px;text-align:right;">المنتجات</div>
                             ${itemsHTML}
                         </div>
 
                         <div class="receipt-totals">
-                            <div class="total-row"><span class="label">Subtotal</span><span class="value">${formatLE(subtotal)}</span></div>
-                            <div class="total-row"><span class="label">Shipping</span><span class="value">${formatLE(shipping)}</span></div>
+                            <div class="total-row"><span class="label">المجموع الفرعي</span><span class="value">${formatLE(subtotal)}</span></div>
+                            <div class="total-row"><span class="label">الشحن</span><span class="value">${formatLE(shipping)}</span></div>
                             <div class="grand-total">
-                                <span>Total</span>
+                                <span>الإجمالي</span>
                                 <span>${formatLE(total)}</span>
                             </div>
                         </div>
 
                         <div class="receipt-footer">
-                            ${new Date().toLocaleString('en-EG', { dateStyle: 'medium', timeStyle: 'short' })} · Thank you for your order
+                            ${new Date().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })} · شكراً لطلبك
                         </div>
                     </div>
                 `;
@@ -1960,19 +1959,17 @@
             const container = document.getElementById('receiptContainer');
             if (!container) return;
 
-            // Build receipt HTML
             container.innerHTML = buildReceiptHTML(order);
             container.style.opacity = '1';
             container.style.pointerEvents = 'none';
 
-            // Wait for DOM update
             await new Promise(r => requestAnimationFrame(r));
             await new Promise(r => setTimeout(r, 150));
 
             const receiptEl = document.getElementById('receiptToCapture');
             if (!receiptEl) {
                 container.innerHTML = '';
-                showToast('Could not generate receipt.');
+                showToast('تعذر إنشاء الإيصال.');
                 return;
             }
 
@@ -1988,14 +1985,14 @@
                 });
 
                 const link = document.createElement('a');
-                link.download = `order-${order._key ? order._key.slice(-8) : 'receipt'}.png`;
+                link.download = `طلب-${order._key ? order._key.slice(-8) : 'receipt'}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
 
-                showToast('PNG downloaded!');
+                showToast('تم تحميل ملف PNG!');
             } catch (err) {
                 console.error('PNG generation error:', err);
-                showToast('Failed to generate PNG.');
+                showToast('فشل إنشاء ملف PNG.');
             } finally {
                 container.innerHTML = '';
                 container.style.opacity = '0';
@@ -2035,7 +2032,6 @@
                 let phoneDigits = phone.replace(/\D/g, '');
                 let waLink = phoneDigits ? `https://wa.me/20${phoneDigits}` : '#';
 
-                // Unique key for this order
                 const orderKey = order._key || '';
 
                 return `
@@ -2064,9 +2060,8 @@
                                 <a href="${waLink}" target="_blank" class="btn btn-success btn-sm whatsapp-btn" ${!phoneDigits ? 'disabled' : ''}>
                                     <i class="fab fa-whatsapp"></i> WhatsApp
                                 </a>
-                                <!-- PRINT PNG BUTTON -->
-                                <button class="btn-print-png print-png-btn" data-key="${orderKey}" title="Download PNG receipt">
-                                    <i class="fas fa-image"></i> Print PNG
+                                <button class="btn-print-png print-png-btn" data-key="${orderKey}" title="تحميل الإيصال كصورة">
+                                    <i class="fas fa-image"></i> طباعة PNG
                                 </button>
                                 <span class="order-detail-toggle" data-key="${orderKey}">Show details</span>
                             </div>
@@ -2089,7 +2084,6 @@
                     `;
             }).join('');
 
-            // ─── EVENT: Update Status ──────────────────────────────
             container.querySelectorAll('.update-status-btn').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const key = btn.dataset.key;
@@ -2102,7 +2096,6 @@
                 });
             });
 
-            // ─── EVENT: Delete Order ──────────────────────────────
             container.querySelectorAll('.delete-order-btn').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const key = btn.dataset.key;
@@ -2114,7 +2107,6 @@
                 });
             });
 
-            // ─── EVENT: Toggle Details ────────────────────────────
             container.querySelectorAll('.order-detail-toggle').forEach(el => {
                 el.addEventListener('click', () => {
                     const key = el.dataset.key;
@@ -2126,7 +2118,6 @@
                 });
             });
 
-            // ─── EVENT: Print PNG ──────────────────────────────────
             container.querySelectorAll('.print-png-btn').forEach(btn => {
                 btn.addEventListener('click', async () => {
                     const key = btn.dataset.key;
@@ -2134,7 +2125,7 @@
                     if (order) {
                         await downloadOrderAsPNG(order);
                     } else {
-                        showToast('Order not found.');
+                        showToast('الطلب غير موجود.');
                     }
                 });
             });
